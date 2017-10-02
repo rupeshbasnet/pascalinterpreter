@@ -3,7 +3,7 @@
 # this token is used to indicate that there is no more input left for lexical analysis
 from Token import Token
 from Lexer import Lexer
-INTEGER, PLUS, MINUS, MUL, DIV, EOF = ('INTEGER', 'PLUS', 'MINUS', 'MUL', 'DIV', 'EOF')
+INTEGER, PLUS, MINUS, MUL, DIV, LPAREN, RPAREN, EOF = ('INTEGER', 'PLUS', 'MINUS', 'MUL', 'DIV', '(', ')', 'EOF')
 
 class Interpreter(object):
     def __init__(self, lexer):
@@ -21,8 +21,14 @@ class Interpreter(object):
 
     def factor(self):
         token = self.current_token
-        self.eat(INTEGER)
-        return token.value
+        if token.type == INTEGER:
+            self.eat(INTEGER)
+            return token.value
+        elif token.type == LPAREN:
+            self.eat(LPAREN)
+            result = self.expr()
+            self.eat(RPAREN)
+            return result
 
     def term(self):
         result = self.factor()
@@ -47,7 +53,7 @@ class Interpreter(object):
             elif token.type == MINUS:
                 self.eat(MINUS)
                 result = result - self.term()
-
+                
         return result
 
 def main():
